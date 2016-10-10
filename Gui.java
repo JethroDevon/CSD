@@ -10,19 +10,26 @@ import java.io.IOException;
 public class Gui extends JPanel{
 
    
-  JTextField fbar;
+    JTextArea aliceField, bobField, charlieField;
+    JButton send;
   
 
-  public Gui() {
+    public Gui() {
       
-    fbar = new JTextField();
-    add(fbar);
+	aliceField = new JTextArea("Alice");
+	bobField = new JTextArea("Bob");
+	charlieField = new JTextArea("Charlie");
+	send = new JButton("SEND");
+	add( aliceField);
+	add( bobField);
+	add( charlieField);
+	add( send);
     
-    JFrame frame = new JFrame("If I can be seen then well done");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setContentPane(this);
-    frame.pack();
-    frame.setVisible(true);
+	JFrame frame = new JFrame("If I can be seen then well done");
+	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	frame.setContentPane(this);
+	frame.pack();
+	frame.setVisible(true);
 
    
     }
@@ -30,8 +37,8 @@ public class Gui extends JPanel{
 
  
 
-  public static void main(String args[]) {
-    new Gui();
-  }
-    
+    public static void main(String args[]) {
+      
+	new Gui();
+    }
 }
