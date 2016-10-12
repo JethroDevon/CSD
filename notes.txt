@@ -1,0 +1,14 @@
+
+
+	• in order to simulate a message passing from Alice to Bob or vice versa
+	it might make sense to always pass to Charlie to pass on, this
+	should simulate the messages transport over the public network, im
+	not sure if I should make it clear that the message is being intercepted
+	by charlie and that charlie isn't given the message as part of
+	the protocol.
+
+	• Changing the options button at any time will reset the whole program
+	immediatley, this will save the protocol from being changed halfway
+	through the running of the demo and creating unkown states.
+
+

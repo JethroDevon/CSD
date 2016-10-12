@@ -1,0 +1,46 @@
+an explanation on classes functionality and basic functions within them
+
+
+• GUI
+
+ will need to contain a lot of swing components for managing options
+ for the whole app however the code simulates communication between three
+ agents, each agent will have identical functionality therefore will be
+ objects  from the Agent class (alice bob and charlie), Agent will extend
+ JPanel and therefore will make up part of the GUI.
+
+ - send() and JButton 'send' this will take text from JTextField 'plaintext'
+   	  and begin the first step of the selected crypto system, from here
+	  on next step will demonstrate each step and sending another
+	  plaintext message at any stage will reset the demo.
+
+ - nextStep() and JButton 'next_step' will use static class 'protocol'
+          to demonstrate and run each step through the selected
+	  cryptosystems protocol, it will also tell the Agent class
+	  objects what to do.
+
+ - varios radio buttons, several option buttons will be available these
+   	  will have an affect on how the protocol class tells other classes
+	  how to encrypt and decrypt things, maybe only should work
+	  after a reset else there will be too many unpredictable states
+
+ - output() and JTextField 'output_box' will output all outputs from all
+   	  functions and so serve as both a debugging console and another
+	  explanation on each stage of the crypto system
+
+ - exit() will exit the program
+
+• Agent
+
+ class will have functions to send text to and recieve from other agents
+ ie sendTo( Agent _agent) this is to simulate communication between Alice and
+ Bob.
+ will contain objects from class encryption in order to have the
+ functionality to encrypt and decrypt plaintext as well as a few methods
+ of doing so (stream shift , compression etc).
+ will have access to static class protocol - this will tell agent what to
+ do and at which step.
+
+ 
+
+

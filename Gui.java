@@ -5,40 +5,46 @@ import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.io.IOException;
-
+import java.awt.Dimension;
+import javax.swing.border.TitledBorder;
 
 public class Gui extends JPanel{
 
-   
-    JTextArea aliceField, bobField, charlieField;
+    TitledBorder title;
+    JTextField plaintext, console;
     JButton send;
-  
-
-    public Gui() {
-      
-	aliceField = new JTextArea("Alice");
-	bobField = new JTextArea("Bob");
-	charlieField = new JTextArea("Charlie");
-	send = new JButton("SEND");
-	add( aliceField);
-	add( bobField);
-	add( charlieField);
-	add( send);
+    JFrame frame;
+    Agent alice = new Agent( "alice");
+    Agent bob = new Agent( "bob");
+    Agent charlie = new Agent( "charlie");
     
-	JFrame frame = new JFrame("If I can be seen then well done");
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	frame.setContentPane(this);
-	frame.pack();
-	frame.setVisible(true);
-
+    public Gui() {
    
-    }
-  
+	JPanel agents = new JPanel();
+	frame = new JFrame();
+	plaintext = new JTextField();
+	plaintext.setPreferredSize( new Dimension( 100,50));
+	send = new JButton( "SEND");	 
+	setLayout(new BoxLayout( this, BoxLayout.PAGE_AXIS));
 
- 
-
-    public static void main(String args[]) {
-      
-	new Gui();
+        title = new TitledBorder( "Input plain text");
+	plaintext.setBorder( title);	
+	frame.setContentPane(this);
+	
+	agents.add( alice);
+	agents.add( charlie);
+	agents.add( bob);
+	
+	plaintext.setColumns(10);
+	frame.setSize( 512, 384);
+	frame.setResizable( false);
+	frame.add( plaintext);
+	frame.add( send);	
+	frame.add( agents);	
+	frame.pack();
+	frame.setVisible( true);
+	
     }
 }
+
+
