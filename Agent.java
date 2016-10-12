@@ -19,12 +19,15 @@ public class Agent extends JPanel{
 
 	setLayout(new BoxLayout( this, BoxLayout.PAGE_AXIS));
 	agentname = _agentname;
-	agentField = new JTextArea( 20, 10);
+	agentField = new JTextArea( 20, 20);
+	agentField.setLineWrap(true);
+	agentField.setWrapStyleWord(true);
 	label = new TitledBorder( _agentname);
 	agentField.setBorder( label);
 	this.setBorder(BorderFactory
 			.createEmptyBorder(10,10,10,10));
-     	add( agentField);
+	JScrollPane scrollpane = new JScrollPane( agentField);
+     	add( scrollpane);
         this.setBorder( this.getBorder());
         this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
 
