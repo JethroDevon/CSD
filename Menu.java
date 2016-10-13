@@ -28,7 +28,8 @@ public class Menu{
 		    }
 		});
 	} catch (Exception e) {
-	    // handle exception
+
+	    
 	}
 
     }

@@ -17,6 +17,7 @@ public class Gui extends JPanel{
     Agent alice = new Agent( "Alice");
     Agent bob = new Agent( "Bob");
     Agent charlie = new Agent( "Charlie");
+    // Protocol protocol = new Protocol();
     
     public Gui() {
 
@@ -24,6 +25,8 @@ public class Gui extends JPanel{
 	//includes the agent objects that are initialised
 	//here
 	JPanel agents = new JPanel();
+	//	JPanel protocolbuttons = new JPanel();
+
 	frame = new JFrame();
 	plaintext = new JTextArea();
 	console = new JTextArea();	
@@ -37,6 +40,7 @@ public class Gui extends JPanel{
 	agents.add( alice);
 	agents.add( charlie);
 	agents.add( bob);
+	//protocolbuttons.add( protocol);
 
 	plaintextTitle = new TitledBorder( "Input Plain Text");
 	consoleTitle = new TitledBorder( "Console Log");
@@ -53,6 +57,7 @@ public class Gui extends JPanel{
 	frame.add( next);
 	JScrollPane scrollpane1 = new JScrollPane( console);
 	frame.add( scrollpane1);
+	//	frame.add( protocolbuttons);
 	frame.pack();
 	frame.setVisible( true);
 	
