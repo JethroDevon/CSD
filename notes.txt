@@ -1,6 +1,7 @@
+			NOTES AND DIFFICULTIES WHILE CODING
 
 
-	• in order to simulate a message passing from Alice to Bob or vice versa
+	• In order to simulate a message passing from Alice to Bob or vice versa
 	it might make sense to always pass to Charlie to pass on, this
 	should simulate the messages transport over the public network, im
 	not sure if I should make it clear that the message is being intercepted
@@ -11,4 +12,14 @@
 	immediatley, this will save the protocol from being changed halfway
 	through the running of the demo and creating unkown states.
 
+	• Button groups in swing help avoid changing state while program
+	is running - although this was eventualy overcome when I decided
+	to do the whole system in one go and then use next step to go
+	back over the even in parts.
 
+	• changed the use for console log output box, this was going
+	to show the steps and working for each encryption decryption as
+	all the programs output data however it made more sense to list
+	the output in the agent boxes and to use the explanations with
+	the same numbers in the log to understand the steps in better
+	detail.

@@ -10,12 +10,14 @@ import java.io.IOException;
 public class Agent extends JPanel{
 
     String agentname;
+    public int[] publicKey = new int[2];
+    private int[] privateKey = new int[3]; 
     JTextArea agentField;
     TitledBorder label;
     ArrayList<String> agentlog = new ArrayList<String>();
     int arrayPos = 0;
     
-    public Agent( String _agentname){
+    Agent( String _agentname){
 
 	setLayout(new BoxLayout( this, BoxLayout.PAGE_AXIS));
 	agentname = _agentname;
@@ -31,6 +33,13 @@ public class Agent extends JPanel{
         this.setBorder( this.getBorder());
         this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
 
+	//generate a public and private key
+	Cryptography cryptTemp = new Cryptography( _agentname, 10, 100);
+	privateKey[0] = cryptTemp.getPrivateKey();
+	privateKey[1] = cryptTemp.getP();
+	privateKey[2] = cryptTemp.getQ();
+	publicKey[0] = cryptTemp.publicKey;
+	publicKey[1] = cryptTemp.getN();
     }
 
     //add log entry to stack
@@ -47,6 +56,13 @@ public class Agent extends JPanel{
 
 	if( arrayPos < agentlog.size() - 1)
 	    arrayPos++;
+    }
+
+   
+
+    public int[] getPublicKey(){
+
+	return publicKey;
     }
 }
 
