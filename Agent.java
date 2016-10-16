@@ -11,7 +11,7 @@ public class Agent extends JPanel{
 
     String agentname;
     public int[] publicKey = new int[2];
-    private int[] privateKey = new int[3]; 
+    private int[] privateKey = new int[2]; 
     JTextArea agentField;
     TitledBorder label;
     ArrayList<String> agentlog = new ArrayList<String>();
@@ -19,6 +19,8 @@ public class Agent extends JPanel{
     
     Agent( String _agentname){
 
+	agentname = _agentname;
+	
 	setLayout(new BoxLayout( this, BoxLayout.PAGE_AXIS));
 	agentname = _agentname;
 	agentField = new JTextArea( 20, 20);
@@ -36,10 +38,10 @@ public class Agent extends JPanel{
 	//generate a public and private key
 	Cryptography cryptTemp = new Cryptography( _agentname, 10, 100);
 	privateKey[0] = cryptTemp.getPrivateKey();
-	privateKey[1] = cryptTemp.getP();
-	privateKey[2] = cryptTemp.getQ();
+	privateKey[1] = cryptTemp.getN();
 	publicKey[0] = cryptTemp.publicKey;
 	publicKey[1] = cryptTemp.getN();
+
     }
 
     //add log entry to stack
@@ -58,11 +60,25 @@ public class Agent extends JPanel{
 	    arrayPos++;
     }
 
-   
+    //done like this to make demo purposes I bit simpler to code
+     public int getPrivateKey(){
 
-    public int[] getPublicKey(){
+	return privateKey[0];
+    }
 
-	return publicKey;
+    public int getPrivateKeyMod(){
+
+	return privateKey[1];
+    }
+
+    public int getPublicKeyMod(){
+
+	return publicKey[1];
+    }
+
+    public int getPublicKey(){
+
+	return publicKey[0];
     }
 }
 

@@ -102,17 +102,25 @@ public class Protocol extends JPanel implements ItemListener{
     //the appropriate stacks this way each step is stored in the stack and displayed with "next step"
     public String startDemo( String plaintext, Agent alice, Agent charlie, Agent bob){
 
-	  //Demonstration always starts like this
-	  String logtext = "Starting demo : \r\n";
+	//Demonstration always starts like this
+	String logtext = "Starting demo : \r\n";
 	  
 	try{
 	  
 	    String tmp = "0: Alice wants to send the message: " + plaintext + " to Bob";
 	    logtext += tmp + "\r\n";
+
+
+
+	    /*
+	     *
+	     *   SHIFT CIPHER METHOD WITH PRE SHARED KEYS
+	     *
+	     */
 	 
 	    //if the shift cipher has been selected and its not random substitution and theres no
 	    //crypto system present then a message is just being sent between two parties
-	    if( bshift && !brandom && bnone){
+	    if( bshift && !brandom){
 
 		logtext += "1: Alice and Bob shared a predecided number between 1 and 26\n before using the shift cipher, alice then sends it to bob and charlie intercepts it. \r\n";
 
@@ -130,37 +138,84 @@ public class Protocol extends JPanel implements ItemListener{
 	    }
 	
 
+
+
+	    /*
+	     *
+	     *      RSA METHOD WHERE EACH ASCII CHARACTER HAS BEEN ENCRYPTED
+	     *
+	     */
+
+	    if( brsa){
+	    
+		logtext += "1: Alice first makes a request from Bob for his public key, this is public so it is okay if Charlie sees it\r\n";
+		alice.addLogEntry( "1: public key please ;" + bob.getPublicKey() + ". mod value ;" + bob.getPublicKeyMod());
+		charlie.addLogEntry( bob.getPublicKey() + "mod value " + bob.getPublicKeyMod());
+		bob.addLogEntry("");
+		
+		logtext += "2: Alice then encrypts the message she wishes to send\r\n";
+		int[] cipherintarray = cryptography.asciiEncryptRSA( plaintext, bob.getPublicKey(), bob.getPublicKeyMod());
+		String ciphertext = "";
+	    
+		for( int i: cipherintarray)
+		    ciphertext += (char) i;
+	    
+		alice.addLogEntry("2: "+ ciphertext);
+		charlie.addLogEntry("");
+		bob.addLogEntry("");
+		
+		logtext += "3: Alice now sends that encrypted message to Bob, Charlie can also see it\r\n";
+		charlie.addLogEntry( ciphertext);
+		bob.addLogEntry("3: " + ciphertext);
+		alice.addLogEntry("");
+		
+		logtext += "4: now all Bob has to do is decrypt the message with his private key";
+		bob.addLogEntry("4: " + cryptography.asciiDecryptRSA( cipherintarray, bob.getPrivateKey(), bob.getPrivateKeyMod()));
+		charlie.addLogEntry("");
+		alice.addLogEntry("");
+	    }
+
 	}catch( Exception e){
 
 	    return "error in protocol.startDemo(), make sure options are correct";
-    }
+	}
 	
-    return logtext;
-}
-
-
-//listener for radio button selection, shows appopriate
-//options boxes
-public void itemStateChanged(ItemEvent e) {
-    if (e.getStateChange() == ItemEvent.SELECTED) {
-
-	if( transport.isSelected()){
-		
-	    transpanel.setVisible(true);
-	    btransport = true;	
-	}
-	if( shift.isSelected()){
-
-	    shiftpanel.setVisible( true);
-	    bshift = true;	
-	}
-    } else {
-
-	transpanel.setVisible(false);
-	shiftpanel.setVisible( false);
-	btransport = false;
-	bshift = false;	    
+	return logtext;
     }
-}
-}
 
+
+    //listener for radio button selection, shows appopriate
+    //options boxes
+    public void itemStateChanged(ItemEvent e) {
+	if (e.getStateChange() == ItemEvent.SELECTED) {
+
+	    if( none.isSelected()){
+		if( transport.isSelected()){
+		
+		    transpanel.setVisible(true);
+		    btransport = true;	
+		}
+		if( shift.isSelected()){
+
+		    shiftpanel.setVisible( true);
+		    bshift = true;	
+		}
+	    }else {
+
+		transpanel.setVisible(false);
+		shiftpanel.setVisible( false);
+		methpanel.setVisible(true);
+		btransport = false;
+		bshift = false;
+		brsa = false;
+	    }
+
+	    if( rsa.isSelected()){
+
+		brsa = true;
+		System.out.println("rsa true");
+	    }
+	}
+    }
+
+}

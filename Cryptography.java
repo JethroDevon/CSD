@@ -52,7 +52,7 @@ public class Cryptography{
 	publicKey = makePublicKey( phi);
 
 	System.out.println("public key ->" + publicKey);
-	System.out.println(" N =" + N + "\n");
+	System.out.println("N = " + N + "\n");
     }
 
     
@@ -87,6 +87,81 @@ public class Cryptography{
 	return shiftcipherEncrypt( _plaintext, 26 - _shiftkey);
     }
 
+    //this method will encrypt each ascii value of each char in a string
+    //using the RSA encryption method - this is not so secure as each ascii
+    //value will use the entire encryption method exposing a lot of examples
+    //of the same cipher in use to charlie
+    int[] asciiEncryptRSA( String _plaintext, int _publicKey, int _N){
+
+	//first each argument must be converted to a big integer for operations
+	//in order to use the modPow()
+	char[] charArray = _plaintext.toCharArray();
+	int csize = charArray.length;
+	BigInteger[] bigArray = new BigInteger[ csize]; 
+		
+	for (int i = 0; i < csize ; i++)
+	    bigArray[i] = BigInteger.valueOf(charArray[i]);
+
+	BigInteger b_publicKey = BigInteger.valueOf( _publicKey); 
+	BigInteger b_N = BigInteger.valueOf( _N);
+
+	int[] encryptedChars = new int[csize];
+	
+        //now loop through each element of the plaintext char
+	//array and perform the modPow() to apply the encryption method
+	for( int i = 0; i < csize; i++){
+
+	    BigInteger temp = bigArray[i].modPow( b_publicKey, b_N);
+	    encryptedChars[i] = temp.intValue();
+	}
+
+	return encryptedChars;
+    }
+
+    //decrypts using converesions to big integer in the same way as above
+    String asciiDecryptRSA( int[] _encryptedchars, int _privateKey, int _N){
+
+	//first each argument must be converted to a big integer for operations
+	//in order to use the modPow()
+	int csize = _encryptedchars.length;
+	BigInteger[] bigArray = new BigInteger[ csize]; 
+		
+	for (int i = 0; i < csize ; i++)
+	    bigArray[i] = BigInteger.valueOf( _encryptedchars[i]);
+
+	BigInteger b_privateKey = BigInteger.valueOf( _privateKey); 
+	BigInteger b_N = BigInteger.valueOf( _N);
+
+	String s = "";
+	
+        //now loop through each element of the plaintext char
+	//array and perform the modPow() to apply the encryption method
+	for( int i = 0; i < csize; i++){
+
+	    BigInteger temp = bigArray[i].modPow( b_privateKey, b_N);
+	    s += (char)temp.intValue();
+	}
+
+	return s;
+    }
+
+    //unlike other function with same name this verstion does not use
+    //the big integer data type, however it works just the same way
+    int[] asciiEncryptRSA2( String _plaintext, int _publicKey, int _N){
+	             
+	char[] echars = _plaintext.toCharArray();
+	int csize = _plaintext.length();
+	int[] encryptedChars = new int[csize];
+	
+        //now loop through each element of the plaintext char
+	//array and perform the modPow() to apply the encryption method
+	for( int i = 0; i < csize; i++){
+
+	    encryptedChars[i] = (int)Math.pow( echars[i], _publicKey % _N) % _N;
+	}
+
+	return encryptedChars;
+    }
     
 
     //function checks the primality of the input number

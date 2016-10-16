@@ -1,6 +1,14 @@
 			NOTES AND DIFFICULTIES WHILE CODING
 
 
+	• Although it was necessary to use the BigInteger datatype in order
+	to use the modPow() I later found I could have bought the modulus forward
+	ie: Mᵉ mod n === java.Math( M, e % n) % n
+
+	• Created an alternative constructor in Cryptography class, if the RSA
+	algorithm isnt being used I can save time by not finding prime numbers
+	which is expensive
+
 	• In order to simulate a message passing from Alice to Bob or vice versa
 	it might make sense to always pass to Charlie to pass on, this
 	should simulate the messages transport over the public network, im
