@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.awt.Dimension;
 import javax.swing.border.TitledBorder;
 
+
+//this class deals with input and displaying swing components,
+//communication and approach to running the program with cryptography
+//functions can be found in the protocol class
 public class Gui extends JPanel implements ActionListener{
 
     TitledBorder plaintextTitle, consoleTitle;
@@ -84,7 +88,7 @@ public class Gui extends JPanel implements ActionListener{
 
 	if( e.getSource() == send){
 
-	    console.setText(protocol.startDemo( plaintext.getText(), alice, charlie, bob));
+	    console.setText( protocol.startDemo( plaintext.getText(), alice, charlie, bob));
 	    alice.nextLog();
 	    charlie.nextLog();
 	    bob.nextLog();

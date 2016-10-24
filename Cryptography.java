@@ -226,7 +226,7 @@ public class Cryptography{
 
 	for( int i = d-=3; i > 0; i--){
 
-	    if(( i * privateKey) % phi == 1){
+	    if(( i * privateKey) % phi == 1){  //checking for a relative prime
 
 		return i;
 	    }

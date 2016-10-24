@@ -23,7 +23,7 @@ public class Menu{
 			//Turn off metal's use of bold fonts
 			UIManager.put("swing.boldMetal", Boolean.FALSE);
 		
-
+		Font f = new Font("serif", Font.PLAIN, fontSize);
 			new Gui();
 		    }
 		});

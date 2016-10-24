@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.io.IOException;
 
 
-
+//this class like the gui class manages GUI components
+//however this class is seperate from the gui class because it manages the way in which the program
+//is used in conjunction with the cryptographic functions and options
 public class Protocol extends JPanel implements ItemListener{
 
     JRadioButton onepad, shift, transport, fourway, rsa, none, random; 
@@ -197,24 +199,25 @@ public class Protocol extends JPanel implements ItemListener{
 		}
 		if( shift.isSelected()){
 
-		    shiftpanel.setVisible( true);
+		    shiftpanel.setVisible( false);
 		    bshift = true;	
 		}
-	    }else {
-
-		transpanel.setVisible(false);
-		shiftpanel.setVisible( false);
-		methpanel.setVisible(true);
-		btransport = false;
-		bshift = false;
-		brsa = false;
-	    }
-
-	    if( rsa.isSelected()){
+	    }else if(  rsa.isSelected()){
 
 		brsa = true;
 		System.out.println("rsa true");
-	    }
+
+	    }else{
+
+		    transpanel.setVisible(false);
+		    shiftpanel.setVisible( false);
+		    methpanel.setVisible(true);
+		    btransport = false;
+		    bshift = false;
+		    brsa = false;
+
+		
+		}
 	}
     }
 
