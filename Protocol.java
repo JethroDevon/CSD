@@ -32,8 +32,8 @@ public class Protocol extends JPanel implements ItemListener{
     Cryptography cryptography = new Cryptography();
 
     //many bool variables for all the options, some default true to match button
-    boolean bonepad, bshift = true, btransport, bfourway, brsa, bnone = true, brandom = false;
-
+    boolean bonepad, bshift, btransport, bfourway, brsa, bnone, brandom;
+    
 
     
     public Protocol(){
@@ -66,9 +66,6 @@ public class Protocol extends JPanel implements ItemListener{
 	//individual radio button logic
 	shift.addItemListener( this);
 	transport.addItemListener( this);
-	transpanel.setVisible(false);
-	shift.setSelected( true);
-	none.setSelected( true);
 
 	//adding components to appropriate panels
 	methpanel.add( onepad);
@@ -81,7 +78,9 @@ public class Protocol extends JPanel implements ItemListener{
 	shiftpanel.add( random, BorderLayout.SOUTH);
 	shiftpanel.add( shift_val, BorderLayout.CENTER);
 	transpanel.add( transkey);
-	
+
+	shiftpanel.setVisible( false);
+	transpanel.setVisible( false);
 	crypt_methods = new ButtonGroup();
 	crypt_methods.add( onepad);
 	crypt_methods.add( shift);
@@ -162,7 +161,7 @@ public class Protocol extends JPanel implements ItemListener{
 		for( int i: cipherintarray)
 		    ciphertext += (char) i;
 	    
-		alice.addLogEntry("2: "+ ciphertext);
+      		alice.addLogEntry("2: "+ ciphertext);
 		charlie.addLogEntry("");
 		bob.addLogEntry("");
 		
@@ -189,36 +188,41 @@ public class Protocol extends JPanel implements ItemListener{
     //listener for radio button selection, shows appopriate
     //options boxes
     public void itemStateChanged(ItemEvent e) {
+
+	///to solve - the none panel has to be true first in order
+	//for the state change un a sub panel to apply
 	if (e.getStateChange() == ItemEvent.SELECTED) {
 
+	    //if non true then these sub options apply
 	    if( none.isSelected()){
-		if( transport.isSelected()){
 		
-		    transpanel.setVisible(true);
-		    btransport = true;	
-		}
-		if( shift.isSelected()){
 
-		    shiftpanel.setVisible( false);
-		    bshift = true;	
-		}
-	    }else if(  rsa.isSelected()){
-
-		brsa = true;
-		System.out.println("rsa true");
-
+		bnone = true;
+		brsa = false;
 	    }else{
 
-		    transpanel.setVisible(false);
-		    shiftpanel.setVisible( false);
-		    methpanel.setVisible(true);
-		    btransport = false;
-		    bshift = false;
-		    brsa = false;
+		bnone = false;
+	    }
 
-		
-		}
+	    if( rsa.isSelected()){
+
+		brsa = true;
+		System.out.println("rsa");
+	        
+	    }
+
+	    if( transport.isSelected()){
+
+		transpanel.setVisible( true);
+		btransport = true;
+	    }
+
+
+	    if( shift.isSelected()){
+
+		shiftpanel.setVisible( true);
+		bshift = true;
+	    }
 	}
     }
-
 }
