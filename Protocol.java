@@ -23,31 +23,28 @@ import java.io.IOException;
 //is used in conjunction with the cryptographic functions and options
 public class Protocol extends JPanel implements ItemListener{
 
-    JRadioButton onepad, shift, transport, fourway, rsa, none, random; 
-    ButtonGroup crypt_methods, crypt_sys;
+    JRadioButton onepad, shift, transport, fourway, rsa, random; 
+    ButtonGroup crypt_methods;
     JFormattedTextField shift_val;
     JTextField transkey;
-    JPanel methpanel, syspanel, shiftpanel, transpanel;
+    JPanel methpanel, shiftpanel, transpanel;
     JLabel shiftlabel;
     Cryptography cryptography = new Cryptography();
 
     //many bool variables for all the options, some default true to match button
-    boolean bonepad, bshift, btransport, bfourway, brsa, bnone, brandom;
+    boolean bone, brsa, bshift, btransport, brandom;
     
-
     
     public Protocol(){
 	
 	//Many swing options to control the way in which the program will work
 	//Gui displays rbuttons when initialised in the Gui class
 	methpanel = new JPanel();
-	syspanel = new JPanel();
 	transpanel = new JPanel();
 	shiftpanel = new JPanel( new BorderLayout());
 	
 	//set the borders for the two button groups
 	methpanel.setBorder(BorderFactory.createTitledBorder( "Cryptographic Method"));
-	syspanel.setBorder(BorderFactory.createTitledBorder( "Cryptographic System"));
 	shiftpanel.setBorder(BorderFactory.createTitledBorder( "Shift Cipher Options"));
 	transpanel.setBorder(BorderFactory.createTitledBorder( "Transposition Key"));
 
@@ -57,7 +54,6 @@ public class Protocol extends JPanel implements ItemListener{
         transport = new JRadioButton("Transposition");
         fourway = new JRadioButton("Four Way Handshake");
         rsa = new JRadioButton("RSA");
-	none = new JRadioButton("none");
 	random = new JRadioButton("Random");
 	shiftlabel = new JLabel("Shift Value ");
 	transkey = new JTextField("Default");
@@ -66,14 +62,14 @@ public class Protocol extends JPanel implements ItemListener{
 	//individual radio button logic
 	shift.addItemListener( this);
 	transport.addItemListener( this);
+	rsa.addItemListener( this);
 
 	//adding components to appropriate panels
 	methpanel.add( onepad);
 	methpanel.add( shift);
         methpanel.add( transport);
-        syspanel.add( fourway);
-        syspanel.add( rsa);
-	syspanel.add( none);
+        methpanel.add( fourway);
+        methpanel.add( rsa);
 	shiftpanel.add( shiftlabel, BorderLayout.EAST);
 	shiftpanel.add( random, BorderLayout.SOUTH);
 	shiftpanel.add( shift_val, BorderLayout.CENTER);
@@ -81,19 +77,16 @@ public class Protocol extends JPanel implements ItemListener{
 
 	shiftpanel.setVisible( false);
 	transpanel.setVisible( false);
+
 	crypt_methods = new ButtonGroup();
 	crypt_methods.add( onepad);
 	crypt_methods.add( shift);
 	crypt_methods.add( transport);
-
-	crypt_sys = new ButtonGroup();
-	crypt_sys.add( fourway);
-	crypt_sys.add( rsa);
-	crypt_sys.add( none);
+	crypt_methods.add( fourway);
+	crypt_methods.add( rsa);
 
 	//adding panels to this functions main JPanel
 	add( methpanel);
-	add( syspanel);
 	add( shiftpanel);
 	add( transpanel);
     }
@@ -121,7 +114,7 @@ public class Protocol extends JPanel implements ItemListener{
 	 
 	    //if the shift cipher has been selected and its not random substitution and theres no
 	    //crypto system present then a message is just being sent between two parties
-	    if( bshift && !brandom){
+	    if( bshift){
 
 		logtext += "1: Alice and Bob shared a predecided number between 1 and 26\n before using the shift cipher, alice then sends it to bob and charlie intercepts it. \r\n";
 
@@ -176,6 +169,14 @@ public class Protocol extends JPanel implements ItemListener{
 		alice.addLogEntry("");
 	    }
 
+	    //if(brsaxorstream)
+
+	    //if(brsaxorblock)
+
+	    //if(el_gamal))
+
+	    //if(fourway)
+
 	}catch( Exception e){
 
 	    return "error in protocol.startDemo(), make sure options are correct";
@@ -193,36 +194,23 @@ public class Protocol extends JPanel implements ItemListener{
 	//for the state change un a sub panel to apply
 	if (e.getStateChange() == ItemEvent.SELECTED) {
 
-	    //if non true then these sub options apply
-	    if( none.isSelected()){
-		
-
-		bnone = true;
-		brsa = false;
-	    }else{
-
-		bnone = false;
-	    }
-
 	    if( rsa.isSelected()){
 
+		System.out.println( "weak utf rsa method selected");
 		brsa = true;
-		System.out.println("rsa");
-	        
+		bshift = false;
+		//all other options are then false
 	    }
-
-	    if( transport.isSelected()){
-
-		transpanel.setVisible( true);
-		btransport = true;
-	    }
-
-
+	    //if button is selected
 	    if( shift.isSelected()){
 
-		shiftpanel.setVisible( true);
+		System.out.println( "shift cipher method");
 		bshift = true;
+		brsa = false;
+
+		//fix shift number
 	    }
+
 	}
     }
 }

@@ -32,6 +32,9 @@ an explanation on classes functionality and basic functions within them
  on it that will relate to just one step of each stage of the selected
  methods protocol
 
+ - initialised with private keys and other features for some encryption in
+   order to correctly simulate how agents would communicate in a cryptosystem
+
  - addLogEntry() logs a
 
  - nextLog()
@@ -45,6 +48,31 @@ an explanation on classes functionality and basic functions within them
 Class is called protocol as it will have to manage each step of the protocols that
 will make up a working cryptosystem, this class will also have options in the form
 of radio buttons and logic based on what sub options to show
- 
+
+
+- a function that actually runs the program based on the input of the radio buttons
+
+
+
+
+• Cryptography
+
+this class will contain each method to encrypt and decrypt data
+
+= rsa(), I will keep more basic versions as I will want to build a good rsa functin
+  and keep some of the experiments on the way up
+
+- shift() ceaser cipher with options to shift by a value
+
+- transform(), standard encryption that will assume alice and bob have pre-shared a value
+
+- fourway() refers to the fourway handshake method using a one time pad
+
+- elgamal() I will try and implement the el gamal algorithm also
+
+- byte shiftStream( byte xor, byte in) returns a stream of bytes based on xor key
+  and returns a byte array that has been xored by the xor input, if the input is the
+  same size or larger then the outcome is not shifted it will be a block change
+
 
 

@@ -6,8 +6,9 @@
  *
  */
 
-import java.math.BigInteger;
-
+import java.math.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
 
 public class Cryptography{
 
@@ -55,10 +56,52 @@ public class Cryptography{
 	System.out.println("N = " + N + "\n");
     }
 
-    
+    ///////////////////// Transport Cipher - Diffusion \\\\\\\\\\\\\\\\\\\\\\\////
+    //this is a transport cipher-it will take a key and a string to shuffle up\\\\
+    // it is taking advantage of utf values again but still demonstrates      ////
+    // how plain text may be broken up and confused by using a couple of loops\\\\
+    ///////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////
+    String transportcipherEncrypt( String _key, String _plaintext){
 
-    //this function simply shifts the alphabet by the given amount
-    //in args and is also known as the Ceasar cipher
+	//rounded up value to find neccessary number of rows
+	int rows =  _plaintext.length() / _key.length();
+
+	//columns match the key length
+	int cols = _key.length();
+	
+        String temp = "";
+	for( int r = 0; r < rows; r++)
+	    for( int c = 0; c < cols; c++){
+
+		int index = (r * _key.length()) + c;
+		
+		//so long as there is no need to pad the empty
+		//cell as theres still plain text to shuffle
+		if( index < _plaintext.length()){
+
+		    ///TODO: overlay keys data once decrypt works
+		    int charval = _plaintext.charAt( index);
+		    char keychar = _key.charAt( c);
+		    int keyint = keychar;
+	       		 
+		    keychar = (char)charval;
+		    temp = String.valueOf( keychar);
+		}else{
+		  
+		    temp = "~";
+		}
+	    }
+
+	return temp;
+    }
+
+        
+   
+    
+    ////////////// Ceasar Cipher - Confusion \\\\\\\\\\\\\\\\\\\\\\\
+    //this function simply shifts the alphabet by the given amount\\
+    //in args and is also known as the Ceasar cipher\\\\\\\\\\\\\\\\
+    ///////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     String shiftcipherEncrypt( String _plaintext, int _shiftkey){
 
 	_shiftkey = _shiftkey % 26 + 26;
@@ -98,10 +141,12 @@ public class Cryptography{
 	char[] charArray = _plaintext.toCharArray();
 	int csize = charArray.length;
 	BigInteger[] bigArray = new BigInteger[ csize]; 
-		
+
+	//turns the char array into an array of big integers
 	for (int i = 0; i < csize ; i++)
 	    bigArray[i] = BigInteger.valueOf(charArray[i]);
 
+	//converts the number N and the public key into big integer versions
 	BigInteger b_publicKey = BigInteger.valueOf( _publicKey); 
 	BigInteger b_N = BigInteger.valueOf( _N);
 
@@ -264,6 +309,47 @@ public class Cryptography{
     public int getQ(){
 
 	return Q;
+    }
+
+    //Uses the first arg to transpose a shift on the second args -
+    //returns a string after it has been converted into bytes, transposed with another byte array
+    //turned back into a string and returned 
+    String  shiftStream( int _K, String _M){
+
+	String temo="-";
+	byte[] shiftstream = _M.getBytes(StandardCharsets.UTF_8);
+	byte[] temp = new byte[ shiftstream.length];
+
+	//first just mess with the code it was almost there
+	byte[] bytes = ByteBuffer.allocate(4).putInt(_K).array(); 
+
+	for( byte o: bytes){
+
+	    int i = o;
+	    System.out.print( i + "-");
+	}
+	try{
+
+	    //check data is equal or less that the _stream in bits
+	    if( bytes.length <= shiftstream.length){
+
+		for( int i = 0; i < shiftstream.length - bytes.length; i++){
+		    for( int c = 0; c < bytes.length; c++){
+		    
+			temp[i] = (byte) ( shiftstream[i] ^ bytes[c] );
+		    }
+		}       		
+	    }
+
+	    //impose a xor shift all the way across the stream
+	    temo = new String( temp, "UTF-8");
+
+	}catch( Exception e){
+
+	    System.out.println( e.toString());
+	}
+	
+	return temo;
     }
    
 }
