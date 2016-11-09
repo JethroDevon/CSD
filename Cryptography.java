@@ -7,6 +7,7 @@
  */
 
 import java.math.*;
+import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
 
@@ -19,7 +20,7 @@ public class Cryptography{
 
     Cryptography(){
 
-	
+	                             
     }
 
     //must add error checking to allow P and Q arent
@@ -61,42 +62,149 @@ public class Cryptography{
     // it is taking advantage of utf values again but still demonstrates      ////
     // how plain text may be broken up and confused by using a couple of loops\\\\
     ///////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////
-    String transportcipherEncrypt( String _key, String _plaintext){
+    String transportEncrypt( String _key, String _plaintext){
 
-	//rounded up value to find neccessary number of rows
-	int rows =  _plaintext.length() / _key.length();
+	//pad out the _plaintext to fit in the tables correctly
+        int add =  _plaintext.length()/_key.length();
+	for (int i = 0; i < add; i++) {
 
-	//columns match the key length
-	int cols = _key.length();
+	    _plaintext += "~";
+	}
 	
-        String temp = "";
-	for( int r = 0; r < rows; r++)
-	    for( int c = 0; c < cols; c++){
+	String[][] temp = stringToArr( _key.length(), _plaintext);
 
-		int index = (r * _key.length()) + c;
-		
-		//so long as there is no need to pad the empty
-		//cell as theres still plain text to shuffle
-		if( index < _plaintext.length()){
+	//must transpose twice otherwise a dimenstion is shifted and transposed
+	String[][] temp2 = transposeMatrix(temp);;
+	temp2 = reverseRows( temp);
+	temp = transposeMatrix(temp2);
+	temp2 = mirrorCols(temp);
 
-		    ///TODO: overlay keys data once decrypt works
-		    int charval = _plaintext.charAt( index);
-		    char keychar = _key.charAt( c);
-		    int keyint = keychar;
-	       		 
-		    keychar = (char)charval;
-		    temp = String.valueOf( keychar);
-		}else{
-		  
-		    temp = "~";
-		}
-	    }
-
-	return temp;
+	
+	return stringArrToString(temp2);
     }
 
-        
-   
+    String transportDecrypt( String _key, String _cipher){
+
+	//only is messed up by transpose when its transposed then sent through this
+        String[][] temp = stringToArr( _key.length(), _cipher);
+	String[][] temp2 = transposeMatrix(temp);
+	showMatrix(temp2);
+	temp = mirrorCols(temp2);
+	showMatrix(temp);
+
+
+	return stringArrToString(temp);
+    }
+
+    //returns an array based on a string in args, number of
+    //columns is dependent on first argument
+    String[][] stringToArr( int cols, String _string){
+
+	///TO_DO make sure that this is does not interfere with the dimensionality
+	int size = _string.length();
+	int rows = size/cols;
+	String[][] sarr = new String[rows][cols];
+	int index = 0;
+	for (int r = 0; r < rows; r++) {
+	    for (int c = 0; c < cols; c++) {
+
+		if( index < size){
+		    
+		    sarr[r][c] = _string.substring( index, index + 1);
+		    index++;
+		}else{
+
+		    sarr[c][r] = "~";
+		}
+	    }
+	}
+
+	//returns the array
+	return sarr;
+    }
+
+    String stringArrToString( String[][] _string){
+
+        int M = _string.length;
+	int N = _string[0].length;
+	
+	String returnString = "";
+
+	for (int i = 0; i < M; i++) {
+	    for (int c = 0; c < N; c++) {
+
+		returnString += _string[i][c];
+	    }
+       
+        }
+ 
+	return returnString;
+    }
+
+    //make a few of these
+    String[][] transposeMatrix( String[][] _string){
+
+	int M = _string.length;
+	int N = _string[0].length;
+	
+	String[][] returnString = new String[N][M];
+
+	for (int i = 0; i < M; i++) {
+	    for (int c = 0; c < N; c++) {
+
+		returnString[c][i] = _string[M - i - 1][c];
+	    }
+       
+        }
+ 
+	return returnString;
+    }
+
+    void showMatrix( String[][] _string){
+
+	int M = _string.length;
+	int N = _string[0].length;
+	
+	for (int i = 0; i < M; i++) {
+	    for (int c = 0; c < N; c++) {
+
+		System.out.print( _string[i][c]);
+	    }
+	    System.out.println();
+        }
+	
+	System.out.println();
+    }
+
+    String[][] mirrorCols( String[][] _temp){
+
+	//reverse each row for added confusion
+        for (int r = 0; r < ( _temp.length/2); r++) {
+
+	    String[] s = _temp[r];
+            _temp[r] = _temp[ _temp.length - r - 1];
+            _temp[ _temp.length - r - 1] = s;
+        }
+
+	return _temp;
+    }
+
+    String[][] reverseRows( String[][] _string){
+
+	int M = _string.length;
+	int N = _string[0].length;
+		
+	String[][] newarray = new String[N][M];
+
+	for (int i = 0; i < M; i++){
+	    for (int c =0; c < N; c++){
+		
+		newarray[c][i] = _string[M-1-i][c];
+	    }
+	}   
+
+	return newarray;
+    }
     
     ////////////// Ceasar Cipher - Confusion \\\\\\\\\\\\\\\\\\\\\\\
     //this function simply shifts the alphabet by the given amount\\
@@ -134,7 +242,7 @@ public class Cryptography{
     //using the RSA encryption method - this is not so secure as each ascii
     //value will use the entire encryption method exposing a lot of examples
     //of the same cipher in use to charlie
-    int[] asciiEncryptRSA( String _plaintext, int _publicKey, int _N){
+    int[] utfEncryptRSA( String _plaintext, int _publicKey, int _N){
 
 	//first each argument must be converted to a big integer for operations
 	//in order to use the modPow()
@@ -163,8 +271,9 @@ public class Cryptography{
 	return encryptedChars;
     }
 
+    
     //decrypts using converesions to big integer in the same way as above
-    String asciiDecryptRSA( int[] _encryptedchars, int _privateKey, int _N){
+    String utfDecryptRSA( int[] _encryptedchars, int _privateKey, int _N){
 
 	//first each argument must be converted to a big integer for operations
 	//in order to use the modPow()
@@ -192,7 +301,7 @@ public class Cryptography{
 
     //unlike other function with same name this verstion does not use
     //the big integer data type, however it works just the same way
-    int[] asciiEncryptRSA2( String _plaintext, int _publicKey, int _N){
+    int[] utfEncryptRSA2( String _plaintext, int _publicKey, int _N){
 	             
 	char[] echars = _plaintext.toCharArray();
 	int csize = _plaintext.length();
@@ -236,7 +345,7 @@ public class Cryptography{
     //an error value
     private int randomPrimeGen( int _min, int _max){
 
-	int randomNum = _min + (int)(Math.random() * _max);
+	int randomNum = ( _min + 100) + (int)(Math.random() * _max + ( _min + 100));
 
 	for( int tmp = randomNum; tmp > 0; tmp--){
 

@@ -42,9 +42,8 @@ public class Agent extends JPanel{
 	publicKey[0] = cryptTemp.publicKey;
 	publicKey[1] = cryptTemp.getN();
 
-	String temp =  cryptTemp.transportcipherEncrypt( "why", "what is life");
-	System.out.println( temp);
-	//System.out.println( cryptTemp.transportcipherDecrypt( "why", temp));
+	String temp = cryptTemp.transportEncrypt( "theKey", "abcdefghijklmnopqrstuvwxyz");
+	System.out.println( "result  " + temp + " becomes " + cryptTemp.transportDecrypt( "theKey",temp));
     }
 
     //add log entry to stack

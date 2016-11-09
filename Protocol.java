@@ -148,7 +148,7 @@ public class Protocol extends JPanel implements ItemListener{
 		bob.addLogEntry("");
 		
 		logtext += "2: Alice then encrypts the message she wishes to send\r\n";
-		int[] cipherintarray = cryptography.asciiEncryptRSA( plaintext, bob.getPublicKey(), bob.getPublicKeyMod());
+		int[] cipherintarray = cryptography.utfEncryptRSA( plaintext, bob.getPublicKey(), bob.getPublicKeyMod());
 		String ciphertext = "";
 	    
 		for( int i: cipherintarray)
@@ -164,7 +164,7 @@ public class Protocol extends JPanel implements ItemListener{
 		alice.addLogEntry("");
 		
 		logtext += "4: now all Bob has to do is decrypt the message with his private key";
-		bob.addLogEntry("4: " + cryptography.asciiDecryptRSA( cipherintarray, bob.getPrivateKey(), bob.getPrivateKeyMod()));
+		bob.addLogEntry("4: " + cryptography.utfDecryptRSA( cipherintarray, bob.getPrivateKey(), bob.getPrivateKeyMod()));
 		charlie.addLogEntry("");
 		alice.addLogEntry("");
 	    }
