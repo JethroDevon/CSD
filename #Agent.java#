@@ -41,17 +41,16 @@ public class Agent extends JPanel{
 	privateKey[1] = cryptTemp.getN();
 	publicKey[0] = cryptTemp.publicKey;
 	publicKey[1] = cryptTemp.getN();
+    // }
 
-    }
+    // //add log entry to stack
+    // public void addLogEntry( String _ale){
 
-    //add log entry to stack
-    public void addLogEntry( String _ale){
+    // 	agentlog.add( _ale);
+    // }
 
-	agentlog.add( _ale);
-    }
-
-    //show entry in log and iterate by one
-    public void nextLog(){
+    // //show entry in log and iterate by one
+    // public void nextLog(){
 
 	
 	agentField.setText( agentField.getText() + agentlog.get(arrayPos) + "\r\n");

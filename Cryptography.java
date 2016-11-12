@@ -6,6 +6,8 @@
  *
  */
 
+import java.util.*;
+import java.lang.*;
 import java.math.*;
 import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
@@ -64,45 +66,42 @@ public class Cryptography{
     ///////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////
     String transportEncrypt( String _key, String _plaintext){
 
+	String plaintext = shiftStream( _key.length(), _plaintext + "~~~~~~~~");
+
 	//pad out the _plaintext to fit in the tables correctly
-        int add =  _plaintext.length()/_key.length();
+        int add =  plaintext.length()/_key.length();
 	for (int i = 0; i < add; i++) {
 
-	    _plaintext += "~";
+	    plaintext += "~";
 	}
 	
-	String[][] temp = stringToArr( _key.length(), _plaintext);
-
+	String[][] temp = stringToArr( plaintext.length()/_key.length(), _key.length(), plaintext);
+      	
 	//must transpose twice otherwise a dimenstion is shifted and transposed
-	String[][] temp2 = transposeMatrix(temp);;
-	temp2 = reverseRows( temp);
-	temp = transposeMatrix(temp2);
-	temp2 = mirrorCols(temp);
-
-	
+	String[][] temp2 = transposeMatrix(temp);
 	return stringArrToString(temp2);
     }
 
     String transportDecrypt( String _key, String _cipher){
 
 	//only is messed up by transpose when its transposed then sent through this
-        String[][] temp = stringToArr( _key.length(), _cipher);
-	String[][] temp2 = transposeMatrix(temp);
+        String[][] temp = stringToArr( _key.length(), _cipher.length()/_key.length(), _cipher);
+	String[][] temp2 = mirrorCols(temp);
 	showMatrix(temp2);
-	temp = mirrorCols(temp2);
-	showMatrix(temp);
+	temp = transposeMatrix( temp2);
+	showMatrix( temp);
+	temp2 = mirrorCols( temp);
+	showMatrix( temp2);
 
-
-	return stringArrToString(temp);
+	return shiftStream( _key.length(), stringArrToString(temp2));
     }
 
     //returns an array based on a string in args, number of
     //columns is dependent on first argument
-    String[][] stringToArr( int cols, String _string){
+    String[][] stringToArr( int rows, int cols, String _string){
 
 	///TO_DO make sure that this is does not interfere with the dimensionality
 	int size = _string.length();
-	int rows = size/cols;
 	String[][] sarr = new String[rows][cols];
 	int index = 0;
 	for (int r = 0; r < rows; r++) {
@@ -234,7 +233,7 @@ public class Cryptography{
 
     //deciphers with negative value of same key that was shifted
     String shiftcipherDecrypt( String _plaintext, int _shiftkey){
-
+	
 	return shiftcipherEncrypt( _plaintext, 26 - _shiftkey);
     }
 
@@ -271,7 +270,17 @@ public class Cryptography{
 	return encryptedChars;
     }
 
-    
+    //uses the rsa algorithm to encrypt and decrypt a number, just use public or private key appropriatley
+    int rsaNumber( int number, int _Key, int _N){
+
+	BigInteger _k = BigInteger.valueOf( _Key);
+	BigInteger b_N = BigInteger.valueOf( _N);
+	BigInteger bnum = BigInteger.valueOf( number);
+        BigInteger temp = bnum.modPow( _k, b_N);
+
+	return temp.intValue();
+    }
+
     //decrypts using converesions to big integer in the same way as above
     String utfDecryptRSA( int[] _encryptedchars, int _privateKey, int _N){
 
@@ -420,29 +429,66 @@ public class Cryptography{
 	return Q;
     }
 
+    //this function overlays a block of random data over the cipher text using the xor
+    //shift 
+    String xorBytes( int _seed, String _input){
+
+	//get length of string
+	int n = _input.length();
+
+	//create psuedo random numbers with as many digits in as n, use that to
+	//create a big integer object
+	Random generator = new Random(_seed);
+	BigInteger tenPown = new BigInteger("10").pow(n);
+	BigInteger num = new BigInteger(100, generator).remainder(tenPown);
+	
+	//convert that big integer to a string, this is so I can turn
+	//chars at a specific index as bytes, theres probaly a more
+	//elegand way to do this however it still works
+	String pad = num.toString();
+	byte[] plaintext = _input.getBytes(StandardCharsets.UTF_8);
+	byte[] byterandom = pad.getBytes(StandardCharsets.UTF_8);
+	byte[] ciphertext = new byte[ plaintext.length];
+	
+	String _output = "";
+
+	for (int i = 0; i < byterandom.length; i++) {
+
+	   
+	    ciphertext[i] =  (byte) ( byterandom[i] ^ plaintext[i]);
+	}
+
+	//convert byte array back into utf characters and append to a string
+	try{
+	    
+	    _output = new String( ciphertext, "UTF-8");
+	}catch( Exception e){
+
+	    System.out.println( e.toString());
+	}
+
+	return _output;
+    }
+
+    
     //Uses the first arg to transpose a shift on the second args -
     //returns a string after it has been converted into bytes, transposed with another byte array
     //turned back into a string and returned 
-    String  shiftStream( int _K, String _M){
+    String shiftStream( int _K, String _M){
 
 	String temo="-";
 	byte[] shiftstream = _M.getBytes(StandardCharsets.UTF_8);
 	byte[] temp = new byte[ shiftstream.length];
 
-	//first just mess with the code it was almost there
+	//create a single byte buffer to overlay string _K
 	byte[] bytes = ByteBuffer.allocate(4).putInt(_K).array(); 
 
-	for( byte o: bytes){
-
-	    int i = o;
-	    System.out.print( i + "-");
-	}
 	try{
 
 	    //check data is equal or less that the _stream in bits
 	    if( bytes.length <= shiftstream.length){
 
-		for( int i = 0; i < shiftstream.length - bytes.length; i++){
+		for( int i = 0; i < shiftstream.length; i++){
 		    for( int c = 0; c < bytes.length; c++){
 		    
 			temp[i] = (byte) ( shiftstream[i] ^ bytes[c] );
@@ -472,3 +518,4 @@ public class Cryptography{
 //http://www.rosettacode.org/wiki/Caesar_cipher#Java better code than my ceasar cipher or one in link above
 //for reminging of steps to RSA algorithm http://flylib.com/books/en/3.190.1.84/1/
 //for help with gcd http://stackoverflow.com/questions/4009198/java-get-greatest-common-divisor
+//help from C_sto @ #cryptography - not sure where he got it though http://ideone.com/mLyRC

@@ -23,16 +23,16 @@ import java.io.IOException;
 //is used in conjunction with the cryptographic functions and options
 public class Protocol extends JPanel implements ItemListener{
 
-    JRadioButton onepad, shift, transport, fourway, rsa, random; 
+    JRadioButton onepad, shift, transport, fourway, rsaInsecure, rsaSecure, random; 
     ButtonGroup crypt_methods;
-    JFormattedTextField shift_val;
+    JFormattedTextField shift_val, rsaHybridKey;
     JTextField transkey;
-    JPanel methpanel, shiftpanel, transpanel;
-    JLabel shiftlabel;
+    JPanel methpanel, shiftpanel, transpanel, securepanel;
+    JLabel shiftlabel, keylabel;
     Cryptography cryptography = new Cryptography();
 
     //many bool variables for all the options, some default true to match button
-    boolean bone, brsa, bshift, btransport, brandom;
+    boolean bone, brsaInsecure, brsaSecure, bshift, btransport, brandom;
     
     
     public Protocol(){
@@ -42,6 +42,7 @@ public class Protocol extends JPanel implements ItemListener{
 	methpanel = new JPanel();
 	transpanel = new JPanel();
 	shiftpanel = new JPanel( new BorderLayout());
+	securepanel = new JPanel( new BorderLayout());
 	
 	//set the borders for the two button groups
 	methpanel.setBorder(BorderFactory.createTitledBorder( "Cryptographic Method"));
@@ -53,42 +54,52 @@ public class Protocol extends JPanel implements ItemListener{
         shift = new JRadioButton("Shift/Substitution");
         transport = new JRadioButton("Transposition");
         fourway = new JRadioButton("Four Way Handshake");
-        rsa = new JRadioButton("RSA");
+        rsaInsecure = new JRadioButton("RSA - Insecure");
+	rsaSecure = new JRadioButton("RSA - Secure");
 	random = new JRadioButton("Random");
 	shiftlabel = new JLabel("Shift Value ");
-	transkey = new JTextField("Default");
+	keylabel = new JLabel( "Secret Key");
+	rsaHybridKey = new JFormattedTextField( new Integer( 1));
+	transkey = new JFormattedTextField( new Integer( 1));
 	shift_val = new JFormattedTextField( new Integer( 1));
 
 	//individual radio button logic
 	shift.addItemListener( this);
 	transport.addItemListener( this);
-	rsa.addItemListener( this);
-
+	rsaInsecure.addItemListener( this);
+	rsaSecure.addItemListener( this);
+	
 	//adding components to appropriate panels
 	methpanel.add( onepad);
 	methpanel.add( shift);
         methpanel.add( transport);
         methpanel.add( fourway);
-        methpanel.add( rsa);
+        methpanel.add( rsaInsecure);
+	methpanel.add( rsaSecure);
 	shiftpanel.add( shiftlabel, BorderLayout.EAST);
 	shiftpanel.add( random, BorderLayout.SOUTH);
 	shiftpanel.add( shift_val, BorderLayout.CENTER);
 	transpanel.add( transkey);
+	securepanel.add( keylabel, BorderLayout.CENTER);
+	securepanel.add( rsaHybridKey, BorderLayout.SOUTH);
 
 	shiftpanel.setVisible( false);
 	transpanel.setVisible( false);
+	securepanel.setVisible( false);
 
 	crypt_methods = new ButtonGroup();
 	crypt_methods.add( onepad);
 	crypt_methods.add( shift);
 	crypt_methods.add( transport);
 	crypt_methods.add( fourway);
-	crypt_methods.add( rsa);
-
+	crypt_methods.add( rsaInsecure);
+	crypt_methods.add( rsaSecure);
+	
 	//adding panels to this functions main JPanel
 	add( methpanel);
 	add( shiftpanel);
 	add( transpanel);
+	add( securepanel);
     }
 
     //goes though appropriate action based on the options selected by the user then store this
@@ -136,42 +147,92 @@ public class Protocol extends JPanel implements ItemListener{
 
 	    /*
 	     *
-	     *      RSA METHOD WHERE EACH ASCII CHARACTER HAS BEEN ENCRYPTED
+	     *      BAD RSA METHOD WHERE EACH UTF CHARACTER HAS BEEN ENCRYPTED - THAT IS STUPID (made it to test rsa maths tho)
 	     *
 	     */
 
-	    if( brsa){
-	    
-		logtext += "1: Alice first makes a request from Bob for his public key, this is public so it is okay if Charlie sees it\r\n";
-		alice.addLogEntry( "1: public key please ;" + bob.getPublicKey() + ". mod value ;" + bob.getPublicKeyMod());
-		charlie.addLogEntry( bob.getPublicKey() + "mod value " + bob.getPublicKeyMod());
-		bob.addLogEntry("");
+	     if( brsaInsecure){
+
+	     	logtext += " THIS METHOD IS FLAWED, THE CIPHER TEXT IS JUST SUBSTITUTED PLAIN TEXT \r\n";
+	     	logtext += "1: Alice first makes a request from Bob for his public key, this is public so it is okay if Charlie sees it\r\n";
+	     	alice.addLogEntry( "1: public key please ;" + bob.getPublicKey() + ". mod value ;" + bob.getPublicKeyMod());
+	     	charlie.addLogEntry( bob.getPublicKey() + "mod value " + bob.getPublicKeyMod());
+	     	bob.addLogEntry("");
 		
-		logtext += "2: Alice then encrypts the message she wishes to send\r\n";
-		int[] cipherintarray = cryptography.utfEncryptRSA( plaintext, bob.getPublicKey(), bob.getPublicKeyMod());
-		String ciphertext = "";
+	     	logtext += "2: Alice then encrypts the message she wishes to send\r\n";
+	     	int[] cipherintarray = cryptography.utfEncryptRSA( plaintext, bob.getPublicKey(), bob.getPublicKeyMod());
+	     	String ciphertext = "";
 	    
-		for( int i: cipherintarray)
-		    ciphertext += (char) i;
+	     	for( int i: cipherintarray)
+	     	    ciphertext += (char) i;
 	    
-      		alice.addLogEntry("2: "+ ciphertext);
-		charlie.addLogEntry("");
-		bob.addLogEntry("");
+      	     	alice.addLogEntry("2: "+ ciphertext);
+	     	charlie.addLogEntry("");
+	     	bob.addLogEntry("");
 		
-		logtext += "3: Alice now sends that encrypted message to Bob, Charlie can also see it\r\n";
-		charlie.addLogEntry( ciphertext);
-		bob.addLogEntry("3: " + ciphertext);
-		alice.addLogEntry("");
+	     	logtext += "3: Alice now sends that encrypted message to Bob, Charlie can also see it\r\n";
+	    	charlie.addLogEntry( ciphertext);
+	    	bob.addLogEntry("3: " + ciphertext);
+	    	alice.addLogEntry("");
 		
-		logtext += "4: now all Bob has to do is decrypt the message with his private key";
-		bob.addLogEntry("4: " + cryptography.utfDecryptRSA( cipherintarray, bob.getPrivateKey(), bob.getPrivateKeyMod()));
-		charlie.addLogEntry("");
-		alice.addLogEntry("");
+	    	logtext += "4: now all Bob has to do is decrypt the message with his private key";
+	    	bob.addLogEntry("4: " + cryptography.utfDecryptRSA( cipherintarray, bob.getPrivateKey(), bob.getPrivateKeyMod()));
+	    	charlie.addLogEntry("");
+	    	alice.addLogEntry("");
 	    }
 
-	    //if(brsaxorstream)
+	    if( brsaSecure){
+	  
+		logtext += "1: Alice requests Bobs public key, this is public so it is okay if charlie sees it\r\n";
+		     
+	        int rsakey = (int) rsaHybridKey.getValue();
+		int bobskey = bob.getPublicKey();
+		int bobsmod =  bob.getPublicKeyMod();
+		int encryptedkey = cryptography.rsaNumber( rsakey, bobskey, bobsmod);
 
-	    //if(brsaxorblock)
+	        alice.addLogEntry( "1: public key please bob;" + bobskey  + ". and your mod value: " + bobsmod);
+	        charlie.addLogEntry( "1: bobs public key is: " + bobskey);
+	     	bob.addLogEntry("");
+	   		
+		logtext += "2: Alice chooses a key, in this case it is: "+ rsakey +" and encrypts it with Bobs public key, then sends it\r\n";
+
+		alice.addLogEntry( "2: sending encrypted key: " + String.valueOf(encryptedkey));
+		bob.addLogEntry( String.valueOf(encryptedkey) );
+		charlie.addLogEntry( "2: intercepted: " + String.valueOf(encryptedkey));
+				
+		logtext += "3: Alice also encrypts the message she wishes to send with that same key value (before it was encrypted)\r\n";
+
+		String ciphertext = cryptography.xorBytes( rsakey, plaintext);
+
+		logtext += "in this case it is overlayed with a random number sequence generated by that same key value";
+		logtext += "\r\n this method also adds some diffusion to that cipher text also by adding a transport encryption cipher\r\n";
+		logtext += "Charlie sees this as well but it is okay because Charlie cannot decrypt it\r\n";
+
+		
+		alice.addLogEntry("3: sending encryped message: " + ciphertext);
+		charlie.addLogEntry( "3: also intercepts the message: " + ciphertext);
+		bob.addLogEntry( "3: " + ciphertext);
+
+		logtext += "4: When Bob recieves the encrypted key he decrypts it.";	
+		
+		int decryptedkey = cryptography.rsaNumber( encryptedkey, bob.getPrivateKey(), bob.getPrivateKeyMod());
+
+		bob.addLogEntry( "decrypting key: " + encryptedkey + " back to " + decryptedkey);
+		alice.addLogEntry("");
+		charlie.addLogEntry( "");
+
+		logtext += "5: lastly, bob uses that key he decrypted to also decrypt the other message he was sent";
+		alice.addLogEntry("");
+		charlie.addLogEntry( "");
+		
+		String plaintext2 = cryptography.xorBytes( decryptedkey, ciphertext);
+
+		bob.addLogEntry( "5: using key to decrypt encrypted messages : " + plaintext2);
+
+		
+	    }
+
+       
 
 	    //if(el_gamal))
 
@@ -187,28 +248,47 @@ public class Protocol extends JPanel implements ItemListener{
 
 
     //listener for radio button selection, shows appopriate
-    //options boxes
+    //options boxes and manages logic for selections, very simple
+    //and goes against the dry principle - but thats swing
     public void itemStateChanged(ItemEvent e) {
 
-	///to solve - the none panel has to be true first in order
-	//for the state change un a sub panel to apply
+	//
 	if (e.getStateChange() == ItemEvent.SELECTED) {
 
-	    if( rsa.isSelected()){
+	    if( rsaInsecure.isSelected()){
 
 		System.out.println( "weak utf rsa method selected");
-		brsa = true;
+		brsaInsecure = true;
+		brsaSecure = false;
+		shiftpanel.setVisible( true);
+		
 		bshift = false;
-		//all other options are then false
+		securepanel.setVisible( false);
+		shiftpanel.setVisible( false);
 	    }
-	    //if button is selected
+
+	    if( rsaSecure.isSelected()){
+
+		System.out.println( "Strong rsa method selected");
+		brsaSecure = true;
+		securepanel.setVisible( true);
+		
+		brsaInsecure = false;
+		bshift = false;
+		shiftpanel.setVisible( false);
+
+	    }
+	    
 	    if( shift.isSelected()){
 
 		System.out.println( "shift cipher method");
 		bshift = true;
-		brsa = false;
-
-		//fix shift number
+		
+		
+		brsaInsecure = false;
+		brsaSecure = false;
+		securepanel.setVisible( false);
+		shiftpanel.setVisible( true);
 	    }
 
 	}
