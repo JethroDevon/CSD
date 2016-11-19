@@ -30,31 +30,43 @@ public class Cryptography{
     //will be too large and the program will hang
     Cryptography( String _rsa, int _min, int _max){
 
-	//get two random numbers
-	P = randomPrimeGen( _min, _max);
-	Q = randomPrimeGen( _min, _max);
-
-	//ensures P != Q
-	while( P == Q){
-
+	//somethimes a parallel prime is not found and private or public
+	//key is initialised with a -1, if this happens the constructor
+	//calls itself again
+	boolean done = false;
+	while( !done){
+	    
+	    //get two random numbers
+	    P = randomPrimeGen( _min, _max);
 	    Q = randomPrimeGen( _min, _max);
+
+	    //ensures P != Q
+	    while( P == Q){
+
+		Q = randomPrimeGen( _min, _max);
+	    }
+
+	    //find a composite of the primes
+	    N = P * Q;
+	    phi = ((P-1)*(Q-1));
+
+	    //select the privateKey so that its
+	    //lowest common devisor with phi is 1  
+	    privateKey = gcdisone( phi);
+
+	    //get the publicKey by selecting an integer that
+	    //times with the public key and mod phi returns 1
+	    publicKey = makePublicKey( phi);
+
+	    //make sure nothing went wrong
+	    if( privateKey != -1 && publicKey != -1){
+
+		done = true;
+	    }
 	}
-
-	//find a composite of the primes
-	N = P * Q;
-	phi = ((P-1)*(Q-1));
-
-	//select the privateKey so that its
-	//lowest common devisor with phi is 1  
-	privateKey = gcdisone( phi);
 
 	System.out.println( _rsa + " keys are");
 	System.out.println("private key ->" + privateKey);
-
-	//get the publicKey by selecting an integer that
-	//times with the public key and mod phi returns 1
-	publicKey = makePublicKey( phi);
-
 	System.out.println("public key ->" + publicKey);
 	System.out.println("N = " + N + "\n");
     }
@@ -307,25 +319,6 @@ public class Cryptography{
 
 	return s;
     }
-
-    //unlike other function with same name this verstion does not use
-    //the big integer data type, however it works just the same way
-    int[] utfEncryptRSA2( String _plaintext, int _publicKey, int _N){
-	             
-	char[] echars = _plaintext.toCharArray();
-	int csize = _plaintext.length();
-	int[] encryptedChars = new int[csize];
-	
-        //now loop through each element of the plaintext char
-	//array and perform the modPow() to apply the encryption method
-	for( int i = 0; i < csize; i++){
-
-	    encryptedChars[i] = (int)Math.pow( echars[i], _publicKey % _N) % _N;
-	}
-
-	return encryptedChars;
-    }
-    
 
     //function checks the primality of the input number
     private boolean checkPrimal( int _num){

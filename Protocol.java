@@ -23,7 +23,7 @@ import java.io.IOException;
 //is used in conjunction with the cryptographic functions and options
 public class Protocol extends JPanel implements ItemListener{
 
-    JRadioButton onepad, shift, transport, fourway, rsaInsecure, rsaSecure, random; 
+    JRadioButton authpad, shift, transport, fourway, rsaInsecure, rsaSecure, random; 
     ButtonGroup crypt_methods;
     JFormattedTextField shift_val, rsaHybridKey;
     JTextField transkey;
@@ -32,7 +32,7 @@ public class Protocol extends JPanel implements ItemListener{
     Cryptography cryptography = new Cryptography();
 
     //many bool variables for all the options, some default true to match button
-    boolean bone, brsaInsecure, brsaSecure, bshift, btransport, brandom;
+    boolean bauth, brsaInsecure, brsaSecure, bshift, btransport, brandom, bfourway;
     
     
     public Protocol(){
@@ -48,18 +48,19 @@ public class Protocol extends JPanel implements ItemListener{
 	methpanel.setBorder(BorderFactory.createTitledBorder( "Cryptographic Method"));
 	shiftpanel.setBorder(BorderFactory.createTitledBorder( "Shift Cipher Options"));
 	transpanel.setBorder(BorderFactory.createTitledBorder( "Transposition Key"));
+	securepanel.setBorder(BorderFactory.createTitledBorder( "Input Unique Key"));
 
 	//initialise all the radio buttons to be used
-        onepad = new JRadioButton("One Time Pad");
+        authpad = new JRadioButton("Authenication (CW2)");
         shift = new JRadioButton("Shift/Substitution");
         transport = new JRadioButton("Transposition");
         fourway = new JRadioButton("Four Way Handshake");
         rsaInsecure = new JRadioButton("RSA - Insecure");
-	rsaSecure = new JRadioButton("RSA - Secure");
+	rsaSecure = new JRadioButton("RSA - Secure (CW1)");
 	random = new JRadioButton("Random");
 	shiftlabel = new JLabel("Shift Value ");
 	keylabel = new JLabel( "Secret Key");
-	rsaHybridKey = new JFormattedTextField( new Integer( 1));
+	rsaHybridKey = new JFormattedTextField( new Integer( 2345));
 	transkey = new JFormattedTextField( new Integer( 1));
 	shift_val = new JFormattedTextField( new Integer( 1));
 
@@ -68,9 +69,11 @@ public class Protocol extends JPanel implements ItemListener{
 	transport.addItemListener( this);
 	rsaInsecure.addItemListener( this);
 	rsaSecure.addItemListener( this);
+	fourway.addItemListener( this);
+	authpad.addItemListener( this);
 	
 	//adding components to appropriate panels
-	methpanel.add( onepad);
+	methpanel.add( authpad);
 	methpanel.add( shift);
         methpanel.add( transport);
         methpanel.add( fourway);
@@ -80,7 +83,6 @@ public class Protocol extends JPanel implements ItemListener{
 	shiftpanel.add( random, BorderLayout.SOUTH);
 	shiftpanel.add( shift_val, BorderLayout.CENTER);
 	transpanel.add( transkey);
-	securepanel.add( keylabel, BorderLayout.CENTER);
 	securepanel.add( rsaHybridKey, BorderLayout.SOUTH);
 
 	shiftpanel.setVisible( false);
@@ -88,7 +90,7 @@ public class Protocol extends JPanel implements ItemListener{
 	securepanel.setVisible( false);
 
 	crypt_methods = new ButtonGroup();
-	crypt_methods.add( onepad);
+	crypt_methods.add( authpad);
 	crypt_methods.add( shift);
 	crypt_methods.add( transport);
 	crypt_methods.add( fourway);
@@ -140,6 +142,11 @@ public class Protocol extends JPanel implements ItemListener{
 		charlie.addLogEntry( "");
 
 		logtext += "\r\n The message is passed on, however this is not very secure\r\n - END -";
+
+		bob.addLogEntry( "ENDOFLOG");
+		alice.addLogEntry("ENDOFLOG");
+		charlie.addLogEntry( "ENDOFLOG");
+
 	    }
 	
 
@@ -179,7 +186,20 @@ public class Protocol extends JPanel implements ItemListener{
 	    	bob.addLogEntry("4: " + cryptography.utfDecryptRSA( cipherintarray, bob.getPrivateKey(), bob.getPrivateKeyMod()));
 	    	charlie.addLogEntry("");
 	    	alice.addLogEntry("");
+
+		bob.addLogEntry( "ENDOFLOG");
+		alice.addLogEntry("ENDOFLOG");
+		charlie.addLogEntry( "ENDOFLOG");
 	    }
+
+	     /*  RSA MESSAGE - CW PART I - THIS METHOD USES RSA ALGORITHM TO SEND MASSEGES SECURLEY
+	     *
+	     *
+	     *    GOOD RSA METHOD THAT IS SIMILAR TO HYBRID RSA & AES - A SEED FOR CRYPTO RANDOM NUMBER IS RSA ENCRYPTED AND SENT  
+	     *    AND THAT RANDOM NUMBER WILL XOR TRANSPOSE THE WHOLE MESSAGE.
+	     *    THE SEED WILL ALSO BE A PASSWORD FOR OTHER ENCRYPTION METHODS.
+	     *
+	     */
 
 	    if( brsaSecure){
 	  
@@ -221,7 +241,7 @@ public class Protocol extends JPanel implements ItemListener{
 		alice.addLogEntry("");
 		charlie.addLogEntry( "");
 
-		logtext += "5: lastly, bob uses that key he decrypted to also decrypt the other message he was sent";
+		logtext += "5: lastly, bob uses that key he decrypted to also decrypt the other message he was sent\r\n";
 		alice.addLogEntry("");
 		charlie.addLogEntry( "");
 		
@@ -229,14 +249,184 @@ public class Protocol extends JPanel implements ItemListener{
 
 		bob.addLogEntry( "5: using key to decrypt encrypted messages : " + plaintext2);
 
-		
+		bob.addLogEntry( "ENDOFLOG");
+		alice.addLogEntry("ENDOFLOG");
+		charlie.addLogEntry( "ENDOFLOG");
+
 	    }
 
        
+	    /*
+	     *
+	     *  EL GEMAL VERSION OF THE RSA MESSAGING METHOD
+	     *
+            */
+	    //if(el_gamal)){}
 
-	    //if(el_gamal))
 
-	    //if(fourway)
+	    /*
+	     *
+	     *  This just demonstrates the transport cipher - it could demonstrate confusion
+	     *  and diffusion in a cipher, only that keys would have to be pre shared so it is
+             *  not practical, and it can be decoded still with brute force and or analysis
+	     *
+	     */
+	    if(btransport){
+
+		logtext += "1: Assuming Alice and bob have allready shared keys alice encrypts\r\n";
+		logtext += "her message and sends it, charlie intercepts and gets to work decodingit";
+
+		String cipher = cryptography.transportEncrypt( "The_Key", plaintext);
+		
+		bob.addLogEntry( "1: "+cipher);
+		alice.addLogEntry( "1: "+cipher);
+		charlie.addLogEntry( "1: "+cipher);
+
+		logtext += "2: Bob then decrypts the data";
+
+		plaintext = cryptography.transportDecrypt( "The_Key", cipher);
+
+		bob.addLogEntry( "2: " + plaintext);
+		alice.addLogEntry("");
+		charlie.addLogEntry( "");
+
+		bob.addLogEntry("ENDOFLOG");
+		alice.addLogEntry("ENDOFLOG");
+		charlie.addLogEntry( "ENDOFLOG");
+		
+	    }
+
+	    /*
+	     *
+	     *    AUTHORISATION - CW PART II - THIS METHOD IS FOR SAFLEY EXCHANGING KEYS WITH A TRUSTED SERVER
+	     *
+	     */
+	    if(bauth){
+
+		System.out.println( "AUTHORISATION!!");
+
+		logtext += " This method will exchange keys between alice and bob using a trusted server\r\n";
+		logtext += " so that Alice and Bob can prove they are who they say they are at the same time\r\n";
+		logtext += " In this example Charlie is the trusted server, the irony is, that if the trusted\r\n";
+		logtext += " is compromised then the trusted server would most definatley be untrusted Charlie\r\n\r\n\r\n";
+		logtext += "1: Alice asks the trusted server for Bobs publickey, the trusted server duly sends it but encrypted\r\n\n\n";
+		logtext += " with its own private key, the server has 'signed' it";
+
+		int BobspublicKey = cryptography.rsaNumber( bob.getPublicKey(), charlie.getPrivateKey(), charlie.getPrivateKeyMod());
+				
+		bob.addLogEntry("");
+		alice.addLogEntry("1: Bobs public key signed by the trusted server - " + BobspublicKey);
+		charlie.addLogEntry("1: request from Alice for public key" );
+
+		logtext += "2: Alice decrypts that key with the trusted servers public key, this way it is definatley from\r\n";
+		logtext += " the trusted server, Alice then sends a 'nonce' encrypted with that decrypted publickey to Bob\r\n";
+                logtext += " some data about Alice, in this case it is her name but it could also contain things\r\n";
+		logtext += " like a timestamp and individual details about Alice, it also contains her public key\r\n";
+		logtext += " however a symetric key has to also be sent in order to decrypt the encrypted nonce\r\n\n\n";
+
+		BobspublicKey = cryptography.rsaNumber( BobspublicKey, charlie.getPublicKey(), charlie.getPrivateKeyMod());
+
+	        int aliceSecret = 6321;
+		String alicenonce = cryptography.xorBytes( aliceSecret, "-n-" + alice.agentname + "-K-" + alice.getPublicKey()+"-M-"+alice.getPublicKeyMod());
+		aliceSecret = cryptography.rsaNumber( aliceSecret, BobspublicKey, bob.getPublicKeyMod());
+		
+	        bob.addLogEntry("2: Alice symetric cipher key - " + aliceSecret + " Alice nonce - " + alicenonce);
+		alice.addLogEntry("2: Bobs decrypted public key: " + BobspublicKey);
+		charlie.addLogEntry("");
+
+		logtext += "3: Bob decrypts these messages";
+	        aliceSecret = cryptography.rsaNumber( aliceSecret, bob.getPrivateKey(), bob.getPrivateKeyMod());
+		alicenonce = cryptography.xorBytes( aliceSecret, alicenonce);
+		
+		bob.addLogEntry( "3: decrypted Alice's key " + aliceSecret + " and Alice's nonce " + alicenonce);
+		alice.addLogEntry("");
+		charlie.addLogEntry( "");
+      	       
+	        String alicespublicKey = cryptography.rsaNumber( alice.getPublicKey(), charlie.getPrivateKey(), charlie.getPrivateKeyMod());
+	       		
+		logtext += "4: Bob requests the servers version of Alice's nonce, the server sends it to B signed\r\n";
+       		
+		bob.addLogEntry( "4: Alice's public key signed by the trusted server - " + alicespublicKey);
+		alice.addLogEntry("");
+		charlie.addLogEntry( "4: request from Bob for public key");
+
+	        logtext += "5: Bob uses the servers public key to decrypt the signed version of Alice's nonce, he compares\r\n";
+		logtext += " the one from the server and the one from Alice, once satisfied that they are the same\r\n";
+		logtext +=, "Bob then uses Alice's encrypted key to both encrypt the secret key to allow for the symetric\r\n";
+		logtext += " encryption algorithm and the nonce that he has stored for alice to check hers against\r\n\n\n";
+
+		alicespublicKey = cryptography.rsaNumber( alicespublicKey , charlie.getPublicKey(), charlie.getPrivateKeyMod());
+		int bobsecret = 3612;
+	        bobsecret = cryptography.rsaNumber( bobsecret, alicespublicKey, alice.getPublicKeyMod());
+		String bobnonce = cryptography.xorBytes( bobsecret, "-n-"+ bob.agentname + "-K-" + bob.getPublicKey() + "-M-" + bob.getPublicKeyMod());
+
+		bob.addLogEntry("5: Alice's decrypted public key: " _ alicespublicKey);
+		alice.addLogEntry("5: Bobs symetric cipher key - " + bobsecret + " Bob's nonce " +  bobnonce);
+		charlie.addLogEntry("");
+
+	        logtext += "6: Alice recieves the message from bob and decrypts the data with her privatekey, she then compares Bob's nonce with hers\r\n";
+		logtext += " once she is satisfied that they are the same she sends his nonce back proving she decrypted it\r\n\n\n";
+
+		
+		bob.addLogEntry("5: Alice's decrypted public key: " _ alicespublicKey);
+		alice.addLogEntry("5: Bobs symetric cipher key - " + bobsecret + " Bob's nonce " +  bobnonce);
+		charlie.addLogEntry("");
+
+		
+		bob.addLogEntry("ENDOFLOG");
+		alice.addLogEntry("ENDOFLOG");
+		charlie.addLogEntry( "ENDOFLOG");
+	    }
+
+	     /*
+	     *
+	     *    THIS METHOD DEMONSTRATES THE FOURWAY HANDSHAKE, THIS WOULD BE A GOOD METHOD ALTHOUGH IT IS PRONE TO A MAN IN THE MIDDLE ATTACK
+	     *
+	     */
+	    if(bfourway){
+
+		logtext += "The fourway handshake seems to be flawless but it does have one\r\n vulnerability";
+		logtext += "without a special protocol its prone to man in the middle attacks\r\n";
+		logtext += "this is how it should work\r\n";
+		logtext += "  1:  Alice uses a shiftstream transposition to send her message" + plaintext +" to bob, charlie intercpts it";
+		
+		String message = cryptography.shiftStream( alice.secretNum + (100/2), plaintext);
+
+		bob.addLogEntry("1: " + message);
+		alice.addLogEntry("1: " + message);
+		charlie.addLogEntry("1: " + message);
+
+		logtext += "2: When bob gets the message he doesnt understand he simply encrypts it with the shiftstream and his secret key as well\r\n";
+		logtext += " then sends it back";
+
+		message = cryptography.shiftStream( bob.secretNum + (100/2), message);
+		
+		bob.addLogEntry("2: " + message);
+		alice.addLogEntry("2: " + message);
+		charlie.addLogEntry("2: " + message);
+
+		logtext += "3: Alice gets the encrypted message and takes her encryption off before sending it to back to Bob\r\n";
+
+		message = cryptography.shiftStream( alice.secretNum + (100/2), message);
+		
+		bob.addLogEntry("3: " + message);
+		alice.addLogEntry("3: " + message);
+		charlie.addLogEntry("3: " + message);
+
+		logtext += "4: Now all bob has to do is take his own encryption off";
+
+		message = cryptography.shiftStream( bob.secretNum + (100/2), message);
+		
+		bob.addLogEntry("4: " + message);
+		alice.addLogEntry("");
+		charlie.addLogEntry("");
+;
+		    
+		    
+		bob.addLogEntry( "ENDOFLOG");
+		alice.addLogEntry("ENDOFLOG");
+		charlie.addLogEntry( "ENDOFLOG");	
+	    }
 
 	}catch( Exception e){
 
@@ -252,7 +442,6 @@ public class Protocol extends JPanel implements ItemListener{
     //and goes against the dry principle - but thats swing
     public void itemStateChanged(ItemEvent e) {
 
-	//
 	if (e.getStateChange() == ItemEvent.SELECTED) {
 
 	    if( rsaInsecure.isSelected()){
@@ -261,10 +450,13 @@ public class Protocol extends JPanel implements ItemListener{
 		brsaInsecure = true;
 		brsaSecure = false;
 		shiftpanel.setVisible( true);
-		
+
+		bfourway = false;
 		bshift = false;
 		securepanel.setVisible( false);
 		shiftpanel.setVisible( false);
+		btransport = false;
+		bauth = false;
 	    }
 
 	    if( rsaSecure.isSelected()){
@@ -276,21 +468,67 @@ public class Protocol extends JPanel implements ItemListener{
 		brsaInsecure = false;
 		bshift = false;
 		shiftpanel.setVisible( false);
-
+		bfourway = false;
+		btransport = false;
+		bauth = false;
 	    }
 	    
 	    if( shift.isSelected()){
 
 		System.out.println( "shift cipher method");
 		bshift = true;
-		
-		
+				
 		brsaInsecure = false;
 		brsaSecure = false;
 		securepanel.setVisible( false);
 		shiftpanel.setVisible( true);
+		bfourway = false;
+		btransport = false;
+		bauth = false;
 	    }
 
+	    if( fourway.isSelected()){
+
+		System.out.println( "The fourway handshake");
+		bfourway = true;
+		
+		brsaInsecure = false;
+		brsaSecure = false;
+		securepanel.setVisible( false);
+		shiftpanel.setVisible( false);
+		btransport = false;
+		bshift = false;
+		bauth = false;
+	    }
+
+	     if( transport.isSelected()){
+
+		System.out.println( "The Transposition Cipher\n");
+		btransport = true;
+		
+		bfourway = false;
+	        brsaInsecure = false;
+		brsaSecure = false;
+		securepanel.setVisible( false);
+		shiftpanel.setVisible( false);
+		bshift = false;
+		bauth = false;
+	    }
+
+	     //something like the pki protocol anyway
+	     if( authpad.isSelected()){
+
+		System.out.println( "PKI protocol");
+		
+		bauth = true;
+
+	 	bfourway = false;
+	        brsaInsecure = false;
+		brsaSecure = false;
+		securepanel.setVisible( false);
+		shiftpanel.setVisible( false);
+		bshift = false;
+	     }
 	}
     }
 }

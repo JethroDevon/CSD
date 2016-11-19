@@ -16,13 +16,14 @@ public class Gui extends JPanel implements ActionListener{
 
     TitledBorder plaintextTitle, consoleTitle;
     JTextArea plaintext, console;
-    JButton send, next;
+    JButton send;
     JFrame frame;
     JPanel fitconsole, fitinput;
     static Agent alice = new Agent( "Alice");
     static Agent bob = new Agent( "Bob");
     static Agent charlie = new Agent( "Charlie");
     Protocol protocol = new Protocol();
+    boolean sent = false;
         
     public Gui(){
 
@@ -35,13 +36,11 @@ public class Gui extends JPanel implements ActionListener{
 	frame = new JFrame();
 	plaintext = new JTextArea();
 	console = new JTextArea();	
-	next = new JButton( "Next Step");
 	send = new JButton( "Send");
 	setLayout( new BoxLayout( this, BoxLayout.PAGE_AXIS));
 
 	send.addActionListener( this);
-	next.addActionListener( this);
-	        
+
 	frame.setContentPane( this);
 	
 	agents.add( alice);
@@ -53,9 +52,9 @@ public class Gui extends JPanel implements ActionListener{
 	consoleTitle = new TitledBorder( "Console Log");
 
 	fitconsole = new JPanel();
-	fitconsole.setLayout( new BoxLayout( fitconsole, BoxLayout.X_AXIS));
+        fitconsole.setLayout( new BoxLayout( fitconsole, BoxLayout.X_AXIS));
 	fitconsole.setPreferredSize( new Dimension( 800, 100));
-        fitconsole.setMaximumSize( new Dimension( 800, 300));
+        fitconsole.setMaximumSize( new Dimension( 800, 600));
 	JScrollPane scrollpane1 = new JScrollPane( console);
 	fitconsole.add( scrollpane1);
 
@@ -70,11 +69,10 @@ public class Gui extends JPanel implements ActionListener{
         fitinput.setBorder( plaintextTitle);
         fitconsole.setBorder( consoleTitle);
 
-	frame.setSize( new Dimension( 812, 584));
+	frame.setSize( new Dimension( 1012, 954));
 	frame.setResizable( false);
 	frame.add( fitinput);
 	frame.add( agents);
-	frame.add( next);
 	frame.add( fitconsole);
 	frame.add( protocolbuttons);
 	frame.pack();
@@ -88,19 +86,36 @@ public class Gui extends JPanel implements ActionListener{
 
 	if( e.getSource() == send){
 
-	    console.setText( protocol.startDemo( plaintext.getText(), alice, charlie, bob));
-	    alice.nextLog();
-	    charlie.nextLog();
-	    bob.nextLog();
-	}else if( e.getSource() == next){
+	    if(!send.getText().equals("quit")){
+		if( sent == false){
+		
+		    console.setText( protocol.startDemo( plaintext.getText(), alice, charlie, bob));
+		    alice.nextLog();
+		    charlie.nextLog();
+		    bob.nextLog();
+		    send.setText( "click next");
+		    sent = true;
+		}else{
 
-	    alice.nextLog();
-	    charlie.nextLog();
-	    bob.nextLog();
+		    alice.nextLog();
+		    charlie.nextLog();
+		    bob.nextLog();
+
+		    if( alice.endofLog() && charlie.endofLog() && bob.endofLog()){
+
+			send.setText( "quit");
+		    }
+		}
+		
+	    //then reset program
+	    }else{
+
+	        System.exit(0);
+	    }
+
 	}
-    }
 	        	
+    }
+
 }
-
-
 
