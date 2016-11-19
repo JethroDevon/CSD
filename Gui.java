@@ -36,7 +36,7 @@ public class Gui extends JPanel implements ActionListener{
 	frame = new JFrame();
 	plaintext = new JTextArea();
 	console = new JTextArea();	
-	send = new JButton( "Send");
+	send = new JButton( "Start Demo");
 	setLayout( new BoxLayout( this, BoxLayout.PAGE_AXIS));
 
 	send.addActionListener( this);
@@ -49,11 +49,11 @@ public class Gui extends JPanel implements ActionListener{
 	protocolbuttons.add( protocol);
 
 	plaintextTitle = new TitledBorder( "Input Plain Text");
-	consoleTitle = new TitledBorder( "Console Log");
+	consoleTitle = new TitledBorder( "Explanation Log");
 
 	fitconsole = new JPanel();
         fitconsole.setLayout( new BoxLayout( fitconsole, BoxLayout.X_AXIS));
-	fitconsole.setPreferredSize( new Dimension( 800, 100));
+	fitconsole.setPreferredSize( new Dimension( 800, 400));
         fitconsole.setMaximumSize( new Dimension( 800, 600));
 	JScrollPane scrollpane1 = new JScrollPane( console);
 	fitconsole.add( scrollpane1);
@@ -86,6 +86,8 @@ public class Gui extends JPanel implements ActionListener{
 
 	if( e.getSource() == send){
 
+	    try{
+
 	    if(!send.getText().equals("quit")){
 		if( sent == false){
 		
@@ -112,7 +114,10 @@ public class Gui extends JPanel implements ActionListener{
 
 	        System.exit(0);
 	    }
+	    }catch( Exception q){
 
+		System.out.println( " Select a method");
+	    }
 	}
 	        	
     }

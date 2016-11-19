@@ -472,6 +472,7 @@ public class Protocol extends JPanel implements ItemListener{
 
 	    if( rsaInsecure.isSelected()){
 
+		
 		System.out.println( "weak utf rsa method selected");
 		brsaInsecure = true;
 		brsaSecure = false;
